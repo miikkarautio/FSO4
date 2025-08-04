@@ -103,6 +103,29 @@ test('blog is deleted succesfully', async () =>  {
 
 })
 
+test('blog likes can be modified succesfully', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToModify = blogsAtStart[0]
+
+    const modifiedBlog = {
+        title: blogToModify.title,
+        author: blogToModify.author,
+        url: blogToModify.url,
+        likes: 20000
+    }
+
+    await api
+        .put(`/api/blogs/${blogToModify.id}`)
+        .send(modifiedBlog)
+        .expect(200)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd.find(blog => blog.id === blogToModify.id)//Katsotaan, että kyseessä on sama blogi
+
+    
+    assert.strictEqual(updatedBlog.likes, 20000) 
+})
+
 
 after(async () => {
   await mongoose.connection.close()
