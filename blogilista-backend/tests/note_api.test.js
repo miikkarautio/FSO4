@@ -87,6 +87,22 @@ test('If new blog doesnt include title or url request is answered with 400', asy
 
 })
 
+test('blog is deleted succesfully', async () =>  {
+
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204) 
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    const contents = blogsAtEnd.map(n => n.title)
+    assert(!contents.includes(blogToDelete.title)) //Tarkistetaan, että poistetun blogin title ei löydy listalta
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1) //Tarkistetaan, että alkuperäisestä blogi listasta puuttuu blogi
+
+})
+
 
 after(async () => {
   await mongoose.connection.close()
