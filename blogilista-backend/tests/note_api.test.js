@@ -52,6 +52,28 @@ test('Can add new blogs with POST', async () => {
     assert(contents.includes('Uusi Blogi'))
 })
 
+test('if "likes" is set to empty default it to 0', async () => {
+
+    const blogWithoutLikes = { //Luodaan uusi blogi, ilman "likes" arvoa
+        title: "Ilman tykkäyksiä",
+        author: "Miikka",
+        url: "Hienompi URL",
+    }
+
+    await api //Postataan uusi blogi
+        .post('/api/blogs')
+        .send(blogWithoutLikes)
+        .expect(201)
+
+    const response = await api.get('/api/blogs')
+
+    const addedBlog = response.body.find(blog => blog.title === 'Ilman tykkäyksiä') //Etsitään tämä spesifi blogi
+
+    assert.strictEqual(typeof addedBlog.likes, 'number') //Tarkistaa onko kyseessä numero
+    assert.strictEqual(addedBlog.likes, 0) //Tarkistaa onko asetettu oletusarvo 0
+})
+
+
 after(async () => {
   await mongoose.connection.close()
 })
