@@ -73,6 +73,20 @@ test('if "likes" is set to empty default it to 0', async () => {
     assert.strictEqual(addedBlog.likes, 0) //Tarkistaa onko asetettu oletusarvo 0
 })
 
+test('If new blog doesnt include title or url request is answered with 400', async () => {
+
+    const wrongfulBlog ={
+        author: 'Rautio',
+        likes: 200,
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(wrongfulBlog)
+        .expect(400)
+
+})
+
 
 after(async () => {
   await mongoose.connection.close()

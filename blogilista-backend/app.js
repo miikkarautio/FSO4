@@ -2,6 +2,7 @@ const config = require('./utils/config')
 const express = require('express')
 const mongoose = require('mongoose')
 const blogsRouter = require('./controllers/blogs')
+const middleware = require('./utils/middleware')
 
 const app = express()
 
@@ -19,5 +20,7 @@ mongoose.connect(url)
 app.use(express.json())
 
 app.use('/', blogsRouter)
+
+app.use(middleware.errorHandler)
 
 module.exports = app
