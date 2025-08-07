@@ -2,7 +2,9 @@ const config = require('./utils/config')
 const express = require('express')
 const mongoose = require('mongoose')
 const blogsRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
 const middleware = require('./utils/middleware')
+
 
 const app = express()
 
@@ -20,6 +22,7 @@ mongoose.connect(url)
 app.use(express.json())
 
 app.use('/', blogsRouter)
+app.use('/', usersRouter)
 
 app.use(middleware.errorHandler)
 
