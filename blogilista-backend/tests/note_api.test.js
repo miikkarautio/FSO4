@@ -11,7 +11,6 @@ const User = require('../models/user')
 
 const api = supertest(app)
 
-
 beforeEach(async () => {
     await Blog.deleteMany({})
     let blogObject = new Blog(helper.initialBlogs[0])
