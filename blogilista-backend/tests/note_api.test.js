@@ -181,6 +181,54 @@ describe('when there is initially one user at db', () => {
         assert.strictEqual(usersAtEnd.length, usersAtStart.length)
     })
 
+    test('Username needs to be atleast 3 characters long', async () => {
+
+        const usersAtStart = await helper.usersInDb()
+
+        const failedUser = {
+            username: 'po',
+            name: 'Pooh',
+            password: 'Pooh'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(failedUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        console.log('Virheilmoitus', result.body.error)
+        assert(result.body.error.includes('expected `username` to be atleast 3 characters'))
+        
+        const usersAtEnd = await helper.usersInDb()
+
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+
+    })
+
+    test('Password needs to be atleast 3 characters long', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const failedUser = {
+            username: 'Toimii',
+            name: 'Tosihyva',
+            password: 'te'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(failedUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+        
+        assert(result.body.error.includes('expected `password` to be atleast 3 characters'))
+
+        const usersAtEnd = await helper.usersInDb()
+
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+
+    })
+
 })
 
 
