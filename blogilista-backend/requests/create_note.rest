@@ -1,0 +1,13 @@
+post http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1paWtrYVJhdXRpbyIsImlkIjoiNjg5NWRlNTk2MzlkMjJiNDU3YTFmNGJkIiwiaWF0IjoxNzU0NzMyNzgyfQ.UP2o6uNIgpPPT2vxxWc5kzwkaFPZfW3ZOQ6TXKOWOiw
+
+
+{
+    "title": "Miikan kirja",
+    "author": "mina itse",
+    "url": "entieda@jotain",
+    "likes": 123
+}
+
+
