@@ -23,15 +23,29 @@ const getTokenFrom = request => {
 
 blogsRouter.post('/api/blogs', async (request, response, next) => {
   const body = request.body
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
-  if(!decodedToken.id){
+  const token = getTokenFrom(request)
+
+  //Jos ei ole tokenia
+  if (!token) {
+    return response.status(401).json({ error: 'token missing' })
+  }
+
+  //Tarkisteaan token
+  let decodedToken
+  try {
+    decodedToken = jwt.verify(token, process.env.SECRET)
+  } catch (error) {
     return response.status(401).json({ error: 'token invalid' })
   }
 
-  const user = await User.findById(decodedToken.id) //Hakee ensimmäisen käyttäjän
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
 
-  if(!user) {
-    return response.status(400).json({ error: 'userId missing or not valid' })
+  const user = await User.findById(decodedToken.id) //Hae käyttäjä
+
+  if (!user) {
+    return response.status(401).json({ error: 'user not found' })
   }
 
   const blog = new Blog({
@@ -48,6 +62,7 @@ blogsRouter.post('/api/blogs', async (request, response, next) => {
 
   response.status(201).json(savedBlog)
 })
+
 
 blogsRouter.delete('/api/blogs/:id', async (request, response, next) => {
 
