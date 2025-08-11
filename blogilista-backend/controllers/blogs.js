@@ -64,6 +64,33 @@ blogsRouter.post('/api/blogs', async (request, response, next) => {
 
 
 blogsRouter.delete('/api/blogs/:id', async (request, response, next) => {
+  const token = request.token //Haetaan poistajan token
+
+  if(!token) {
+    return response.status(401).json({ error: 'token missing' })
+  }
+
+  let decodedToken
+  try {
+    decodedToken = jwt.verify(token, process.env.SECRET)
+  } catch (error) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+
+  let blog
+  try {
+    blog = await Blog.findById(request.params.id)
+  } catch (exception) {
+    return next(exception)
+  } //Haetaan poistettava blogi, joka sisältää käyttäjä ID
+
+  if(!blog) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
+
+  if(!blog.user || blog.user.toString() !== decodedToken.id) {
+    return response.status(401).json({ error: 'Only the owner of the blog can delete it' })
+  }
 
   try {
     await Blog.findByIdAndDelete(request.params.id)
@@ -71,7 +98,6 @@ blogsRouter.delete('/api/blogs/:id', async (request, response, next) => {
   } catch (exception) {
     next(exception)
   }
-
 })
 
 blogsRouter.put('/api/blogs/:id', async (request, response, next) => {
