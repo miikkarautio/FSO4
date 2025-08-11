@@ -22,10 +22,13 @@ mongoose.connect(url)
 
 app.use(express.json())
 
+app.use(middleware.tokenExtractor)
+
 app.use('/', blogsRouter)
 app.use('/', usersRouter)
 app.use('/', loginRouter)
 
 app.use(middleware.errorHandler)
+
 
 module.exports = app

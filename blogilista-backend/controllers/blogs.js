@@ -13,18 +13,17 @@ blogsRouter.get('/api/blogs', async (request, response, next) => {
   }
 })
 
-const getTokenFrom = request => {
+/* const getTokenFrom = request => {
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
   }
   return null
-}
+} */
 
 blogsRouter.post('/api/blogs', async (request, response, next) => {
   const body = request.body
-  const token = getTokenFrom(request)
-
+  const token = request.token
   //Jos ei ole tokenia
   if (!token) {
     return response.status(401).json({ error: 'token missing' })
