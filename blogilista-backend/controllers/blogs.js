@@ -1,7 +1,6 @@
 const blogsRouter  = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+const { userExtractor } = require('../utils/middleware')
 
 blogsRouter.get('/api/blogs', async (request, response, next) => {
   try {
@@ -13,39 +12,9 @@ blogsRouter.get('/api/blogs', async (request, response, next) => {
   }
 })
 
-/* const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-} */
-
-blogsRouter.post('/api/blogs', async (request, response, next) => {
+blogsRouter.post('/api/blogs', userExtractor, async (request, response, next) => {
   const body = request.body
-  const token = request.token
-  //Jos ei ole tokenia
-  if (!token) {
-    return response.status(401).json({ error: 'token missing' })
-  }
-
-  //Tarkisteaan token
-  let decodedToken
-  try {
-    decodedToken = jwt.verify(token, process.env.SECRET)
-  } catch (error) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-
-  const user = await User.findById(decodedToken.id) //Hae käyttäjä
-
-  if (!user) {
-    return response.status(401).json({ error: 'user not found' })
-  }
+  const user = request.user
 
   const blog = new Blog({
     title: body.title,
@@ -63,19 +32,9 @@ blogsRouter.post('/api/blogs', async (request, response, next) => {
 })
 
 
-blogsRouter.delete('/api/blogs/:id', async (request, response, next) => {
-  const token = request.token //Haetaan poistajan token
+blogsRouter.delete('/api/blogs/:id', userExtractor, async (request, response, next) => {
+  const user = request.user
 
-  if(!token) {
-    return response.status(401).json({ error: 'token missing' })
-  }
-
-  let decodedToken
-  try {
-    decodedToken = jwt.verify(token, process.env.SECRET)
-  } catch (error) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
 
   let blog
   try {
@@ -88,7 +47,7 @@ blogsRouter.delete('/api/blogs/:id', async (request, response, next) => {
     return response.status(404).json({ error: 'blog not found' })
   }
 
-  if(!blog.user || blog.user.toString() !== decodedToken.id) {
+  if(!blog.user || blog.user.toString() !== user.id.toString()) {
     return response.status(401).json({ error: 'Only the owner of the blog can delete it' })
   }
 
