@@ -33,6 +33,13 @@ test('The blogs _id is refactored correctly as "id"', async () => {
 })
 
 test('Can add new blogs with POST', async () => {
+
+    const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'root', password: 'sekret' })
+
+    const token = loginResponse.body.token
+
     const newBlog = {
         title: "Uusi Blogi",
         author: "Miikka",
@@ -42,6 +49,7 @@ test('Can add new blogs with POST', async () => {
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)

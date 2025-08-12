@@ -14,7 +14,7 @@ blogsRouter.get('/api/blogs', async (request, response, next) => {
 
 blogsRouter.post('/api/blogs', userExtractor, async (request, response, next) => {
   const body = request.body
-  const user = request.user
+  const user = request.user //tulee userExtractorista
 
   const blog = new Blog({
     title: body.title,
@@ -33,9 +33,8 @@ blogsRouter.post('/api/blogs', userExtractor, async (request, response, next) =>
 
 
 blogsRouter.delete('/api/blogs/:id', userExtractor, async (request, response, next) => {
-  const user = request.user
-
-
+  const user = request.user //tulee userExtractorista
+  
   let blog
   try {
     blog = await Blog.findById(request.params.id)
