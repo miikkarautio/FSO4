@@ -270,6 +270,28 @@ describe('when there is initially one user at db', () => {
 
     })
 
+    test('New blog cannot be added if theres no token', async () => {
+
+        await api
+            .post('/api/login')
+            .send({ username: 'root', password: 'sekret' })
+
+        const newBlog = {
+            title: 'Uusi blogi',
+            author: 'Miikka',
+            url: 'HienoUrl',
+            likes: 10
+        }
+
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+
+        assert.ok(response.body.error.includes('token missing'))
+    })
+
 })
 
 
