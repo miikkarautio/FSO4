@@ -11,11 +11,21 @@ const User = require('../models/user')
 
 const api = supertest(app)
 
+let user 
+
 beforeEach(async () => {
+
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    user = new User({ username: 'root', passwordHash })
+        
+    await user.save()
+
     await Blog.deleteMany({})
-    let blogObject = new Blog(helper.initialBlogs[0])
+    let blogObject = new Blog({ ...helper.initialBlogs[0], user: user._id})
     await blogObject.save()
-    blogObject = new Blog(helper.initialBlogs[1])
+    blogObject = new Blog({ ...helper.initialBlogs[1], user: user._id})
     await blogObject.save()
 })
 
@@ -63,6 +73,12 @@ test('Can add new blogs with POST', async () => {
 
 test('if "likes" is set to empty default it to 0', async () => {
 
+    const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'root', password: 'sekret' })
+    
+    const token = loginResponse.body.token
+
     const blogWithoutLikes = { //Luodaan uusi blogi, ilman "likes" arvoa
         title: "Ilman tykkäyksiä",
         author: "Miikka",
@@ -71,6 +87,7 @@ test('if "likes" is set to empty default it to 0', async () => {
 
     await api //Postataan uusi blogi
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(blogWithoutLikes)
         .expect(201)
 
@@ -84,6 +101,12 @@ test('if "likes" is set to empty default it to 0', async () => {
 
 test('If new blog doesnt include title or url request is answered with 400', async () => {
 
+    const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
+
+    const token = loginResponse.body.token
+
     const wrongfulBlog ={
         author: 'Rautio',
         likes: 200,
@@ -91,6 +114,7 @@ test('If new blog doesnt include title or url request is answered with 400', asy
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(wrongfulBlog)
         .expect(400)
 
@@ -98,10 +122,20 @@ test('If new blog doesnt include title or url request is answered with 400', asy
 
 test('blog is deleted succesfully', async () =>  {
 
+    const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'root', password: 'sekret' })
+
+    const token = loginResponse.body.token
+
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204) 
+
+    await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
 
@@ -140,7 +174,7 @@ describe('when there is initially one user at db', () => {
         await User.deleteMany({})
 
         const passwordHash = await bcrypt.hash('sekret', 10)
-        const user = new User({ username: 'root', passwordHash })
+        user = new User({ username: 'root', passwordHash })
         
         await user.save()
     })
