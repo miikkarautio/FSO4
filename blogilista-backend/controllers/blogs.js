@@ -2,7 +2,7 @@ const blogsRouter  = require('express').Router()
 const Blog = require('../models/blog')
 const { userExtractor } = require('../utils/middleware')
 
-blogsRouter.get('/api/blogs', async (request, response, next) => {
+blogsRouter.get('/', async (request, response, next) => {
   try {
     const blogs = await Blog
       .find({}).populate('user', { username: 1, name: 1 })
@@ -12,7 +12,7 @@ blogsRouter.get('/api/blogs', async (request, response, next) => {
   }
 })
 
-blogsRouter.post('/api/blogs', userExtractor, async (request, response, next) => {
+blogsRouter.post('/', userExtractor, async (request, response, next) => {
   const body = request.body
   const user = request.user //tulee userExtractorista
 
@@ -32,7 +32,7 @@ blogsRouter.post('/api/blogs', userExtractor, async (request, response, next) =>
 })
 
 
-blogsRouter.delete('/api/blogs/:id', userExtractor, async (request, response, next) => {
+blogsRouter.delete('/:id', userExtractor, async (request, response, next) => {
   const user = request.user //tulee userExtractorista
   
   let blog
@@ -58,7 +58,7 @@ blogsRouter.delete('/api/blogs/:id', userExtractor, async (request, response, ne
   }
 })
 
-blogsRouter.put('/api/blogs/:id', async (request, response, next) => {
+blogsRouter.put('/:id', async (request, response, next) => {
   try {
     const { likes } = request.body
 

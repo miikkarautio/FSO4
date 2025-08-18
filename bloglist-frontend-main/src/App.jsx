@@ -13,6 +13,7 @@ const App = () => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )  
+
   }, [])
 
   const handleLogin = async (event) => {
@@ -22,6 +23,7 @@ const App = () => {
       const user = await loginService.login({
         username, password
       })
+/*       blogService.setToken(user.token) */
       setUser(user)
       setUsername('')
       setPassword('')
@@ -34,34 +36,51 @@ const App = () => {
 
   }
 
+  const loginForm = () => (
+    <form onSubmit={handleLogin}>
+      <h2>log in to application</h2>
+      <div>
+        username
+        <input
+        type='text'
+        value={username}
+        name='Username'
+        onChange={({ target }) => setUsername(target.value)}
+        />
+      </div>
+      <div>
+        password
+        <input
+        type='password'
+        value={password}
+        name='Password'
+        onChange={({ target }) => setPassword(target.value)}
+        />
+      </div>
+      <button type='submit'>Login</button>
+    </form>
+  )
+
+  const blogForm = () => (
+    <form onSubmit={addBlog}>
+      <input
+      value={newBlog}
+      onChange={handleBlogChange}
+      />
+      <button type='submit'>Save</button>
+    </form>
+  )
+
+  const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
 
   return (
     <div>
-      <h2>log in to application</h2>
-        <form  onSubmit={handleLogin}>
-          <div>
-            username
-            <input
-            type='text'
-            value={username}
-            name='Username'
-            onChange={({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            password
-            <input
-            type='password'
-            value={password}
-            name='Password'
-            onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button type='submit'>login</button>
-        </form>
 
-      <h2>blogs</h2>
-      {blogs.map(blog =>
+       {!user && loginForm()}
+{/*        {user && blogForm()} */}
+
+      {user && <h2>blogs</h2>}
+      {blogsToShow.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
     </div>
