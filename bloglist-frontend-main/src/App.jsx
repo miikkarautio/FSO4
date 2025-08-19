@@ -18,11 +18,16 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
+  
     
     try {
       const user = await loginService.login({
         username, password
       })
+    
+    window.localStorage.setItem(
+      'loggedBlogappUser', JSON.stringify(user)
+    )
 /*       blogService.setToken(user.token) */
       setUser(user)
       setUsername('')
@@ -35,6 +40,7 @@ const App = () => {
     }
 
   }
+
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -60,6 +66,8 @@ const App = () => {
       <button type='submit'>Login</button>
     </form>
   )
+  
+
 
   const blogForm = () => (
     <form onSubmit={addBlog}>
@@ -73,6 +81,12 @@ const App = () => {
 
   const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
 
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+  }
+
+
   return (
     <div>
 
@@ -80,6 +94,7 @@ const App = () => {
 {/*        {user && blogForm()} */}
 
       {user && <h2>blogs</h2>}
+      {user && <p>{user.username} is logged in <button onClick={handleLogout}>Logout</button></p>}
       {blogsToShow.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
