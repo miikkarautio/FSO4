@@ -5,6 +5,7 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [newBlog, setNewBlog] = useState({ author: '', title: '', url: '' })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -13,13 +14,10 @@ const App = () => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )  
-
   }, [])
 
   const handleLogin = async (event) => {
     event.preventDefault()
-  
-    
     try {
       const user = await loginService.login({
         username, password
@@ -28,7 +26,7 @@ const App = () => {
     window.localStorage.setItem(
       'loggedBlogappUser', JSON.stringify(user)
     )
-/*       blogService.setToken(user.token) */
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -50,7 +48,7 @@ const App = () => {
         <input
         type='text'
         value={username}
-        name='Username'
+        name='username'
         onChange={({ target }) => setUsername(target.value)}
         />
       </div>
@@ -59,7 +57,7 @@ const App = () => {
         <input
         type='password'
         value={password}
-        name='Password'
+        name='password'
         onChange={({ target }) => setPassword(target.value)}
         />
       </div>
@@ -71,21 +69,62 @@ const App = () => {
     <div>
       <h2>Blogs</h2>
       <p>{user.username} is logged in <button onClick={handleLogout}>Logout</button></p>
-      {blogsToShow.map(blog => (
-        <Blog key={blog.id} blog={blog}/>
-      ))}
     </div>
   )
 
+  const addBlog = async (event) => {
+    event.preventDefault()
+    const blogObject = {
+      author: newBlog.author,
+      title: newBlog.title,
+      url: newBlog.url
+    }
+
+    const addedBlog = await blogService.create(blogObject)
+    setBlogs(blogs.concat(addedBlog))
+    setNewBlog({ author: '', title: '', url: '' })
+
+  }
+
+  const handleBlogChange = (event) => {
+    const { name, value } = event.target
+    setNewBlog(values => ({...values, [name]: value}))
+  }
+
   const blogForm = () => (
     <form onSubmit={addBlog}>
-      <input
-      value={newBlog}
-      onChange={handleBlogChange}
+      <h2>Create new</h2>
+      <div>
+        Author:
+        <input
+          value={newBlog.author}
+          name='author'
+          onChange={handleBlogChange}
+          placeholder='Author'
       />
+      </div>
+      <div>
+        Title:
+        <input
+          value={newBlog.title}
+          name='title'
+          onChange={handleBlogChange}
+          placeholder='Title'
+      />
+      </div>
+      <div>
+        Url:
+        <input
+          value={newBlog.url}
+          name='url'
+          onChange={handleBlogChange}
+          placeholder='URL'
+      />
+      </div>
       <button type='submit'>Save</button>
     </form>
   )
+
 
   const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
 
@@ -99,6 +138,12 @@ const App = () => {
     <div>
       {!user && loginForm()}
       {user && loggedInUser()}
+      {user && blogForm()}
+      {blogsToShow.map(blog => (
+        <Blog key={blog.id} blog={blog}/>
+      ))}
+      
+      
     </div>
   )
 }
