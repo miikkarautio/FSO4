@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -25,6 +26,7 @@ const App = () => {
   const [message, setMessage] = useState(null)
   const [messageStyle, setMessageStyle] = useState(null)
   const [loginVisible, setLoginVisible] = useState(false)
+  const [blogFormVisible, setBlogFormVisible] = useState(false)
 
 
   useEffect(() => {
@@ -57,7 +59,6 @@ const App = () => {
     }
 
   }
-
 
   const loginForm = () => {
 
@@ -117,39 +118,29 @@ const App = () => {
     setNewBlog(values => ({...values, [name]: value}))
   }
 
-  const blogForm = () => (
-    <form onSubmit={addBlog}>
-      <h2>Create new</h2>
+  const blogForm = () => {
+
+    const hideWhenVisible = { display: blogFormVisible ? 'none' : '' }
+    const showWhenVisible = { display: blogFormVisible ? '' : 'none' }
+
+    return (
       <div>
-        Author:
-        <input
-          value={newBlog.author}
-          name='author'
-          onChange={handleBlogChange}
-          placeholder='Author'
-      />
+        <div style={hideWhenVisible}>
+          <button onClick={() => setBlogFormVisible(true)}>Create New Blog</button>
+        </div>
+        <div style={showWhenVisible}>
+          <BlogForm
+            author={newBlog.author}
+            title={newBlog.title}
+            url={newBlog.url}
+            handleFieldChange={handleBlogChange}
+            handleSubmit={addBlog}
+          />
+          <button onClick={() => setBlogFormVisible(false)}>cancel</button>
+        </div>
       </div>
-      <div>
-        Title:
-        <input
-          value={newBlog.title}
-          name='title'
-          onChange={handleBlogChange}
-          placeholder='Title'
-      />
-      </div>
-      <div>
-        Url:
-        <input
-          value={newBlog.url}
-          name='url'
-          onChange={handleBlogChange}
-          placeholder='URL'
-      />
-      </div>
-      <button type='submit'>Save</button>
-    </form>
-  )
+    )
+  }
   
 
   const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
