@@ -26,7 +26,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState(null)
   const [messageStyle, setMessageStyle] = useState(null)
-  const [blogFormVisible, setBlogFormVisible] = useState(false)
 
 
   useEffect(() => {
@@ -105,17 +104,8 @@ const App = () => {
     setNewBlog(values => ({...values, [name]: value}))
   }
 
-  const blogForm = () => {
-
-    const hideWhenVisible = { display: blogFormVisible ? 'none' : '' }
-    const showWhenVisible = { display: blogFormVisible ? '' : 'none' }
-
-    return (
-      <div>
-        <div style={hideWhenVisible}>
-          <button onClick={() => setBlogFormVisible(true)}>Create New Blog</button>
-        </div>
-        <div style={showWhenVisible}>
+  const blogForm = () => (
+        <Togglable buttonLabel='Add blog' >
           <BlogForm
             author={newBlog.author}
             title={newBlog.title}
@@ -123,11 +113,9 @@ const App = () => {
             handleFieldChange={handleBlogChange}
             handleSubmit={addBlog}
           />
-          <button onClick={() => setBlogFormVisible(false)}>cancel</button>
-        </div>
-      </div>
-    )
-  }
+        </Togglable>
+    
+  )
   
 
   const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
