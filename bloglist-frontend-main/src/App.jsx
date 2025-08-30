@@ -20,7 +20,6 @@ const Notification = ({ message, style }) => {
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newBlog, setNewBlog] = useState({ author: '', title: '', url: '' })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -78,20 +77,13 @@ const App = () => {
     </div>
   )
 
-  const addBlog = async (event) => {
-    event.preventDefault()
-    const blogObject = {
-      author: newBlog.author,
-      title: newBlog.title,
-      url: newBlog.url
-    }
+  const addBlog = async (blogObject) => {
 
     const addedBlog = await blogService.create(blogObject)
     setBlogs(blogs.concat(addedBlog))
-    setNewBlog({ author: '', title: '', url: '' })
 
     setMessageStyle({ color: 'green' })
-    setMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`)
+    setMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
     setTimeout(() => {
       setMessageStyle(null)
       setMessage(null)
@@ -99,20 +91,11 @@ const App = () => {
 
   }
 
-  const handleBlogChange = (event) => {
-    const { name, value } = event.target
-    setNewBlog(values => ({...values, [name]: value}))
-  }
+
 
   const blogForm = () => (
         <Togglable buttonLabel='Add blog' >
-          <BlogForm
-            author={newBlog.author}
-            title={newBlog.title}
-            url={newBlog.url}
-            handleFieldChange={handleBlogChange}
-            handleSubmit={addBlog}
-          />
+          <BlogForm createBlog={addBlog}/>
         </Togglable>
     
   )

@@ -1,45 +1,64 @@
-const BlogForm = ({
-    handleSubmit,
-    handleFieldChange,
-    author,
-    title,
-    url
-}) => {
+import { useState } from "react";
+
+const BlogForm = ({ createBlog }) => {
+    const [newBlog, setNewBlog] = useState({ author: '', title: '', url: '' })
+
+    const addBlog = (event) => {
+        event.preventDefault()
+        createBlog({
+            author: newBlog.author,
+            title: newBlog.title,
+            url: newBlog.url
+        })
+
+        setNewBlog({ author: '', title: '', url: '' })
+
+    }
+
+    const handleBlogChange = (event) => {
+    const { name, value } = event.target
+    setNewBlog(values => ({...values, [name]: value}))
+    }
+    
+
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+    <div>
+        <form onSubmit={addBlog}>
             <h2>Create new</h2>
             <div>
                 Author:
                 <input
-                value={author}
-                name='author'
-                onChange={handleFieldChange}
-                placeholder='Author'
-            />
+                    value={newBlog.author}  
+                    name='author'
+                    onChange={handleBlogChange}
+                    placeholder='Author'
+                />
             </div>
             <div>
                 Title:
                 <input
-                value={title}
-                name='title'
-                onChange={handleFieldChange}
-                placeholder='Title'
-            />
+                    value={newBlog.title}
+                    name='title'
+                    onChange={handleBlogChange}
+                    placeholder='Title'
+                />
             </div>
             <div>
                 Url:
                 <input
-                value={url}
-                name='url'
-                onChange={handleFieldChange}
-                placeholder='URL'
-            />
+                    value={newBlog.url}
+                    name='url'
+                    onChange={handleBlogChange}
+                    placeholder='URL'
+                />
             </div>
             <button type='submit'>Save</button>
-            </form>
-        </div>
+        </form>
+    </div>
     )
 }
 
 export default BlogForm
+
+
+
