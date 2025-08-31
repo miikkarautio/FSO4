@@ -101,11 +101,23 @@ const App = () => {
   )
   
 
-  const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
+  
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
+  }
+
+  const toggleBlogInfo = () => {
+
+    const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
+
+    return (
+      blogsToShow.map(blog => (
+        <Blog key={blog.id} blog={blog}/>
+      ))
+      
+    )
   }
 
 
@@ -115,10 +127,7 @@ const App = () => {
       {!user && loginForm()}
       {user && loggedInUser()}
       {user && blogForm()}
-      {blogsToShow.map(blog => (
-        <Blog key={blog.id} blog={blog}/>
-      ))}
-      
+      {toggleBlogInfo()}
       
     </div>
   )
