@@ -100,12 +100,22 @@ const App = () => {
     
   )
   
-
-  
-
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
+  }
+
+  const addLike = async (id) => {
+    const blog = blogs.find(n => n.id === id)
+    const changedBlog = { ...blog, likes: blog.likes + 1 }
+
+    try {
+      const updatedBlog = await blogService.update(id, changedBlog)
+      setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog))
+    } catch (exception) {
+      console.log(exception)
+    }
+    
   }
 
   const toggleBlogInfo = () => {
@@ -114,7 +124,11 @@ const App = () => {
 
     return (
       blogsToShow.map(blog => (
-        <Blog key={blog.id} blog={blog}/>
+        <Blog
+        key={blog.id}
+        blog={blog}
+        addLike={() => addLike(blog.id)}
+        />
       ))
       
     )
