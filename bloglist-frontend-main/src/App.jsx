@@ -7,6 +7,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 
+
 const Notification = ({ message, style }) => {
   if(message === null) {
     return null
@@ -91,8 +92,6 @@ const App = () => {
 
   }
 
-
-
   const blogForm = () => (
         <Togglable buttonLabel='Add blog' >
           <BlogForm createBlog={addBlog}/>
@@ -118,6 +117,18 @@ const App = () => {
     
   }
 
+  const handleDelete = async (id) => {
+    
+    try {
+      window.confirm("Delete blog?")
+      await blogService.deleteBlog(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+    } catch (exception) {
+      console.log(exception)
+    }
+
+  }
+
   const toggleBlogInfo = () => {
 
     const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
@@ -130,6 +141,7 @@ const App = () => {
         key={blog.id}
         blog={blog}
         addLike={() => addLike(blog.id)}
+        deleteBlog={blog.user?.username === user.username ? () => handleDelete(blog.id) : undefined}
         />
       ))
       
