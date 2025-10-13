@@ -122,8 +122,10 @@ const App = () => {
 
     const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
 
+    const sortedBlogs = blogsToShow.toSorted((a, b) => b.likes - a.likes);
+
     return (
-      blogsToShow.map(blog => (
+      sortedBlogs.map(blog => (
         <Blog
         key={blog.id}
         blog={blog}
