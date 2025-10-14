@@ -9,10 +9,10 @@ import loginService from './services/login'
 
 
 const Notification = ({ message, style }) => {
-  if(message === null) {
+  if (message === null) {
     return null
   }
-  return(
+  return (
     <div style={style} className='basic'>
       {message}
     </div>
@@ -30,8 +30,8 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+      setBlogs(blogs)
+    )
   }, [])
 
   const handleLogin = async (event) => {
@@ -40,10 +40,10 @@ const App = () => {
       const user = await loginService.login({
         username, password
       })
-    
-    window.localStorage.setItem(
-      'loggedBlogappUser', JSON.stringify(user)
-    )
+
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(user)
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -54,21 +54,22 @@ const App = () => {
       setTimeout(() => {
         setMessageStyle(null)
         setMessage(null)
+        console.log(exception)
       }, 3000)
     }
 
   }
 
   const loginForm = () => (
-        <Togglable buttonLabel = 'login'>
-          <LoginForm
-            username={username}
-            password={password}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-            handleSubmit={handleLogin}
-          />
-        </Togglable>
+    <Togglable buttonLabel='login'>
+      <LoginForm
+        username={username}
+        password={password}
+        handleUsernameChange={({ target }) => setUsername(target.value)}
+        handlePasswordChange={({ target }) => setPassword(target.value)}
+        handleSubmit={handleLogin}
+      />
+    </Togglable>
   )
 
   const loggedInUser = () => (
@@ -93,12 +94,12 @@ const App = () => {
   }
 
   const blogForm = () => (
-        <Togglable buttonLabel='Add blog' >
-          <BlogForm createBlog={addBlog}/>
-        </Togglable>
-    
+    <Togglable buttonLabel='Add blog' >
+      <BlogForm createBlog={addBlog} />
+    </Togglable>
+
   )
-  
+
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
@@ -114,13 +115,13 @@ const App = () => {
     } catch (exception) {
       console.log(exception)
     }
-    
+
   }
 
   const handleDelete = async (id) => {
-    
+
     try {
-      window.confirm("Delete blog?")
+      window.confirm('Delete blog?')
       await blogService.deleteBlog(id)
       setBlogs(blogs.filter(blog => blog.id !== id))
     } catch (exception) {
@@ -133,30 +134,30 @@ const App = () => {
 
     const blogsToShow = user ? blogs : [] //Jos käyttäjä on, näytetään blogit muuten tyhjä lista
 
-    const sortedBlogs = blogsToShow.toSorted((a, b) => b.likes - a.likes);
+    const sortedBlogs = blogsToShow.toSorted((a, b) => b.likes - a.likes)
 
     return (
       sortedBlogs.map(blog => (
         <Blog
-        key={blog.id}
-        blog={blog}
-        addLike={() => addLike(blog.id)}
-        deleteBlog={blog.user?.username === user.username ? () => handleDelete(blog.id) : undefined}
+          key={blog.id}
+          blog={blog}
+          addLike={() => addLike(blog.id)}
+          deleteBlog={blog.user?.username === user.username ? () => handleDelete(blog.id) : undefined}
         />
       ))
-      
+
     )
   }
 
 
   return (
     <div>
-      <Notification style={messageStyle} message={message}/>
+      <Notification style={messageStyle} message={message} />
       {!user && loginForm()}
       {user && loggedInUser()}
       {user && blogForm()}
       {toggleBlogInfo()}
-      
+
     </div>
   )
 }
