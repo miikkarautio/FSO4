@@ -141,6 +141,7 @@ const App = () => {
         <Blog
           key={blog.id}
           blog={blog}
+          user={user}
           addLike={() => addLike(blog.id)}
           deleteBlog={blog.user?.username === user.username ? () => handleDelete(blog.id) : undefined}
         />
