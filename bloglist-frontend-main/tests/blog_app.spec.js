@@ -85,6 +85,37 @@ test.describe('Blog app', () => {
             await expect(page.getByText('Test Blog by Test Author has been deleted')).toBeVisible()
         })
 
+        test('only the creator can see the delete button', async ({ page, request }) => {
+            await page.getByRole('button', { name: 'Add blog' }).click()
+            await page.getByLabel('author').fill('Test Author')
+            await page.getByLabel('title').fill('Test Blog')
+            await page.getByLabel('url').fill('http://test.com')
+            await page.getByRole('button', { name: 'Save' }).click()
+            await expect(page.getByText('a new blog Test Blog by Test Author added')).toBeVisible()
+
+            await page.getByRole('button', { name: 'View' }).click()
+            await expect(page.getByRole('button', { name: 'Delete' })).toBeVisible()
+            await page.getByRole('button', { name: 'Hide' }).click()
+
+            await page.getByRole('button', { name: 'Logout' }).click()
+
+            await request.post('http://localhost:3003/api/users', {
+                data: {
+                    name: 'Second User',
+                    username: 'seconduser',
+                    password: 'password'
+                }
+            })
+
+            await page.getByLabel('username').fill('seconduser')
+            await page.getByLabel('password').fill('password')
+            await page.getByRole('button', { name: 'login' }).click()
+            await expect(page.getByText('seconduser is logged in')).toBeVisible()
+
+            await page.getByRole('button', { name: 'View' }).click()
+            await expect(page.getByRole('button', { name: 'Delete' })).not.toBeVisible()
+        })
+
     })
 
 })
