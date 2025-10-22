@@ -116,6 +116,34 @@ test.describe('Blog app', () => {
             await expect(page.getByRole('button', { name: 'Delete' })).not.toBeVisible()
         })
 
+        test('blogs are sorted by likes in descending order', async ({ page }) => {
+
+            await page.getByRole('button', { name: 'Add blog' }).click()
+            await page.getByLabel('title').fill('First Blog')
+            await page.getByLabel('author').fill('Author 1')
+            await page.getByLabel('url').fill('http://first.com')
+            await page.getByRole('button', { name: 'Save' }).click()
+            await expect(page.getByText('a new blog First Blog by Author 1 added')).toBeVisible()
+
+
+            await page.getByLabel('title').fill('Second Blog')
+            await page.getByLabel('author').fill('Author 2')
+            await page.getByLabel('url').fill('http://second.com')
+            await page.getByRole('button', { name: 'Save' }).click()
+            await expect(page.getByText('a new blog Second Blog by Author 2 added')).toBeVisible()
+
+            const secondBlog = await page.getByText('Second Blog Author 2')
+            await secondBlog.getByRole('button', { name: 'View' }).click()
+            await page.getByRole('button', { name: 'Like' }).click()
+            await expect(page.getByText('Likes 1')).toBeVisible()
+            await page.getByRole('button', { name: 'Like' }).click()
+            await expect(page.getByText('Likes 2')).toBeVisible()
+
+            const blogElements = await page.locator('div').filter({ hasText: /View|Hide/ }).all()
+            await expect(blogElements[0]).toContainText('Second Blog')
+            await expect(blogElements[1]).toContainText('First Blog')
+        })
+
     })
 
 })
