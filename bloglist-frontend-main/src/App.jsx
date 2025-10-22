@@ -117,11 +117,23 @@ const App = () => {
   }
 
   const handleDelete = async (id) => {
+    const blog = blogs.find(b => b.id === id)
+    const confirmDelete = window.confirm(`Delete blog ${blog.title} by ${blog.author}?`)
+
+    if (!confirmDelete) {
+      return
+    }
 
     try {
-      window.confirm('Delete blog?')
       await blogService.deleteBlog(id)
       setBlogs(blogs.filter(blog => blog.id !== id))
+
+      setMessageStyle({ color: 'green' })
+      setMessage(`${blog.title} by ${blog.author} has been deleted`)
+      setTimeout(() => {
+        setMessageStyle(null)
+        setMessage(null)
+      }, 5000)
     } catch (exception) {
       console.log(exception)
     }
